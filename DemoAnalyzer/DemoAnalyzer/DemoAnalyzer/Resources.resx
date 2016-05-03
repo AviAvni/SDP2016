@@ -129,4 +129,13 @@
     <value>Type name contains lowercase letters</value>
     <comment>The title of the diagnostic.</comment>
   </data>
+  <data name="RethrowAnalyzerDescription" xml:space="preserve">
+    <value>Re-throwing caught exception changes stack information.</value>
+  </data>
+  <data name="RethrowAnalyzerMessageFormat" xml:space="preserve">
+    <value>Re-throwing caught exception changes stack information.</value>
+  </data>
+  <data name="RethrowAnalyzerTitle" xml:space="preserve">
+    <value>Rethrow to preserve stack details.</value>
+  </data>
 </root>

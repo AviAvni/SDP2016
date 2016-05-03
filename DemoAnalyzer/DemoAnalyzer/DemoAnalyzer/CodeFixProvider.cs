@@ -19,10 +19,11 @@ namespace DemoAnalyzer
     public class DemoAnalyzerCodeFixProvider : CodeFixProvider
     {
         private const string title = "Make uppercase";
+        private const string rethrowTitle = "Make rethrow";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(DemoAnalyzerAnalyzer.DiagnosticId); }
+            get { return ImmutableArray.Create(DemoAnalyzerAnalyzer.DiagnosticId, DemoAnalyzerAnalyzer.RethrowDiagnosticId); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()
@@ -37,18 +38,36 @@ namespace DemoAnalyzer
 
             // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
             var diagnostic = context.Diagnostics.First();
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
+            if (diagnostic.Id == DemoAnalyzerAnalyzer.DiagnosticId)
+            {
+                var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            // Find the type declaration identified by the diagnostic.
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
+                // Find the type declaration identified by the diagnostic.
+                var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
 
-            // Register a code action that will invoke the fix.
-            context.RegisterCodeFix(
-                CodeAction.Create(
-                    title: title,
-                    createChangedSolution: c => MakeUppercaseAsync(context.Document, declaration, c),
-                    equivalenceKey: title),
-                diagnostic);
+                // Register a code action that will invoke the fix.
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title: title,
+                        createChangedSolution: c => MakeUppercaseAsync(context.Document, declaration, c),
+                        equivalenceKey: title),
+                    diagnostic);
+            }
+            else
+            {
+                var diagnosticSpan = diagnostic.Location.SourceSpan;
+
+                // Find the throw statement by the diagnostic.
+                var throwStatement = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<ThrowStatementSyntax>().First();
+
+                // Register a code action that will invoke the fix.
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title: rethrowTitle,
+                        createChangedSolution: c => MakeRethrowAsync(context.Document, throwStatement, c),
+                        equivalenceKey: rethrowTitle),
+                    diagnostic);
+            }
         }
 
         private async Task<Solution> MakeUppercaseAsync(Document document, TypeDeclarationSyntax typeDecl, CancellationToken cancellationToken)
@@ -68,6 +87,24 @@ namespace DemoAnalyzer
 
             // Return the new solution with the now-uppercase type name.
             return newSolution;
+        }
+
+        private async Task<Solution> MakeRethrowAsync(Document document, ThrowStatementSyntax throwStatement, CancellationToken cancellationToken)
+        {
+            // Create the rethrow statement.
+            var rethrowExpression = SyntaxFactory.ThrowStatement();
+
+            // Get document root node.
+            var root = await document.GetSyntaxRootAsync();
+
+            // Replace the throw statement with rethrow statement.
+            var newRoot = root.ReplaceNode(throwStatement, rethrowExpression);
+
+            // Create new document with new root
+            var newDocument = document.WithSyntaxRoot(newRoot);
+
+            // Return the new solution with the rethrow statement.
+            return newDocument.Project.Solution;
         }
     }
 }
