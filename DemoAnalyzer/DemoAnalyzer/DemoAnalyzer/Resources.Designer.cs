@@ -89,6 +89,33 @@ namespace DemoAnalyzer {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generic analyzer for checking attributes.
+        /// </summary>
+        internal static string GenericAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("GenericAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; not contains attribute &apos;{1}&apos;.
+        /// </summary>
+        internal static string GenericAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("GenericAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generic analyzer for checking attributes.
+        /// </summary>
+        internal static string GenericAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("GenericAnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Re-throwing caught exception changes stack information..
         /// </summary>
         internal static string RethrowAnalyzerDescription {

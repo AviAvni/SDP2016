@@ -129,6 +129,15 @@
     <value>Type name contains lowercase letters</value>
     <comment>The title of the diagnostic.</comment>
   </data>
+  <data name="GenericAnalyzerDescription" xml:space="preserve">
+    <value>Generic analyzer for checking attributes</value>
+  </data>
+  <data name="GenericAnalyzerMessageFormat" xml:space="preserve">
+    <value>Type '{0}' not contains attribute '{1}'</value>
+  </data>
+  <data name="GenericAnalyzerTitle" xml:space="preserve">
+    <value>Generic analyzer for checking attributes</value>
+  </data>
   <data name="RethrowAnalyzerDescription" xml:space="preserve">
     <value>Re-throwing caught exception changes stack information.</value>
   </data>

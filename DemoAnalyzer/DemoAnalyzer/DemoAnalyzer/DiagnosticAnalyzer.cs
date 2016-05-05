@@ -15,6 +15,7 @@ namespace DemoAnalyzer
     {
         public const string DiagnosticId = "DemoAnalyzer";
         public const string RethrowDiagnosticId = "RethrowDemoAnalyzer";
+        public const string GenericDiagnosticId = "GenericDemoAnalyzer";
 
         // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
         // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Localizing%20Analyzers.md for more on localization
@@ -28,18 +29,26 @@ namespace DemoAnalyzer
         private static readonly LocalizableString RethrowDescription = new LocalizableResourceString(nameof(Resources.RethrowAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private const string RethrowCategory = "Usage";
 
+        private static readonly LocalizableString GenericTitle = new LocalizableResourceString(nameof(Resources.GenericAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString GenericMessageFormat = new LocalizableResourceString(nameof(Resources.GenericAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString GenericDescription = new LocalizableResourceString(nameof(Resources.GenericAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+        private const string GenericCategory = "Generic";
+
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         private static DiagnosticDescriptor RethrowRule = new DiagnosticDescriptor(RethrowDiagnosticId, RethrowTitle, RethrowMessageFormat, RethrowCategory, DiagnosticSeverity.Error, isEnabledByDefault: true, description: RethrowDescription);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule, RethrowRule); } }
+        private static DiagnosticDescriptor GenericRule = new DiagnosticDescriptor(GenericDiagnosticId, GenericTitle, GenericMessageFormat, GenericCategory, DiagnosticSeverity.Error, isEnabledByDefault: true, description: RethrowDescription);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule, RethrowRule, GenericRule); } }
 
         public override void Initialize(AnalysisContext context)
         {
             // TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
-            context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeNode, SyntaxKind.ThrowStatement);
+            context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeThrowNode, SyntaxKind.ThrowStatement);
+            context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeInvocationNode, SyntaxKind.InvocationExpression);
         }
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
@@ -57,7 +66,7 @@ namespace DemoAnalyzer
             }
         }
 
-        private void AnalyzeNode(SyntaxNodeAnalysisContext context)
+        private void AnalyzeThrowNode(SyntaxNodeAnalysisContext context)
         {
             var throwStatement = (ThrowStatementSyntax)context.Node;
             ExpressionSyntax expr = throwStatement.Expression;
@@ -97,6 +106,41 @@ namespace DemoAnalyzer
                     case SyntaxKind.ClassDeclaration:
                     case SyntaxKind.StructDeclaration:
                         return;
+                }
+            }
+        }
+
+        private void AnalyzeInvocationNode(SyntaxNodeAnalysisContext context)
+        {
+            var invocationExpression = (InvocationExpressionSyntax)context.Node;
+            if (invocationExpression.ArgumentList.Arguments.Count == 0 ||
+                context.SemanticModel.GetDiagnostics(invocationExpression.Span).Any(d => d.Severity == DiagnosticSeverity.Error))
+            {
+                return;
+            }
+            var symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpression, context.CancellationToken);
+            var methodSymbol = symbolInfo.Symbol as IMethodSymbol;
+            if (methodSymbol == null)
+                return;
+
+            for (int i = 0; i < methodSymbol.Parameters.Length; i++)
+            {
+                var parameter = methodSymbol.Parameters[i];
+                var attribute = parameter.GetAttributes().FirstOrDefault(attr => attr.AttributeClass.Name == "NeedsAttribute");
+                if (attribute == null || attribute.ConstructorArguments.Length != 1 || attribute.ConstructorArguments[0].Kind != TypedConstantKind.Type)
+                    continue;
+
+                var attributeType = (INamedTypeSymbol)attribute.ConstructorArguments[0].Value;
+
+                var argument = invocationExpression.ArgumentList.Arguments[i];
+                var argumentExpression = argument.Expression;
+                var argumentType = context.SemanticModel.GetTypeInfo(argumentExpression, context.CancellationToken);
+                var argumentAttributes = argumentType.Type.GetAttributes();
+
+                if (!argumentAttributes.Any(attr => attr.AttributeClass.Name == attributeType.Name))
+                {
+                    var diagnostic = Diagnostic.Create(GenericRule, argument.GetLocation(), argumentType.Type.Name, attributeType.Name);
+                    context.ReportDiagnostic(diagnostic);
                 }
             }
         }
