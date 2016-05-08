@@ -50,7 +50,6 @@ namespace DemoAnalyzer
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
             context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeThrowNode, SyntaxKind.ThrowStatement);
             context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeInvocationNode, SyntaxKind.InvocationExpression);
-            //context.RegisterOperationAction(AnalyzeInvocationOperation, OperationKind.InvocationExpression);
         }
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
@@ -146,33 +145,5 @@ namespace DemoAnalyzer
                 }
             }
         }
-
-        //private void AnalyzeInvocationOperation(OperationAnalysisContext context)
-        //{
-        //    var invocationExpression = (IInvocationExpression)context.Operation;
-        //    var targetMethod = invocationExpression.TargetMethod;
-        //    if (targetMethod == null)
-        //        return;
-
-        //    for (int i = 0; i < targetMethod.Parameters.Length; i++)
-        //    {
-        //        var parameter = targetMethod.Parameters[i];
-        //        var attribute = parameter.GetAttributes().FirstOrDefault(attr => attr.AttributeClass.Name == "NeedsAttribute");
-        //        if (attribute == null || attribute.ConstructorArguments.Length != 1 || attribute.ConstructorArguments[0].Kind != TypedConstantKind.Type)
-        //            continue;
-
-        //        var attributeType = (INamedTypeSymbol)attribute.ConstructorArguments[0].Value;
-
-        //        var argument = invocationExpression.ArgumentsInParameterOrder[i];
-        //        var argumentType = argument.Type;
-        //        var argumentAttributes = argumentType.GetAttributes();
-
-        //        if (!argumentAttributes.Any(attr => attr.AttributeClass.Name == attributeType.Name))
-        //        {
-        //            var diagnostic = Diagnostic.Create(GenericRule, argument.Syntax.GetLocation(), argumentType.Name, attributeType.Name);
-        //            context.ReportDiagnostic(diagnostic);
-        //        }
-        //    }
-        //}
     }
 }
