@@ -71,12 +71,12 @@ namespace DemoAnalyzer.Test
 
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
-            return new DemoAnalyzerCodeFixProvider();
+            return new MakeUpperCaseCodeFixProvider();
         }
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            return new DemoAnalyzerAnalyzer();
+            return new MakeUppercaseAnalyzer();
         }
     }
 }
