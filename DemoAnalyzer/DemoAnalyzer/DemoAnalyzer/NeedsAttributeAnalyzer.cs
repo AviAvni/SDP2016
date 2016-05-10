@@ -26,8 +26,8 @@ namespace DemoAnalyzer
 
         public override void Initialize(AnalysisContext context)
         {
-            //context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeInvocationNode, SyntaxKind.InvocationExpression);
-            context.RegisterOperationAction(AnalyzeInvocationOperation, OperationKind.InvocationExpression);
+            context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeInvocationNode, SyntaxKind.InvocationExpression);
+            //context.RegisterOperationAction(AnalyzeInvocationOperation, OperationKind.InvocationExpression);
         }
 
         private void AnalyzeInvocationNode(SyntaxNodeAnalysisContext context)
