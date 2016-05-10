@@ -26,8 +26,8 @@ namespace DemoAnalyzer
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeInvocationNode, SyntaxKind.InvocationExpression);
-            //context.RegisterOperationAction(AnalyzeInvocationOperation, OperationKind.InvocationExpression);
+            //context.RegisterSyntaxNodeAction<SyntaxKind>(AnalyzeInvocationNode, SyntaxKind.InvocationExpression);
+            context.RegisterOperationAction(AnalyzeInvocationOperation, OperationKind.InvocationExpression);
         }
 
         private void AnalyzeInvocationNode(SyntaxNodeAnalysisContext context)
@@ -57,7 +57,7 @@ namespace DemoAnalyzer
                 var argumentType = context.SemanticModel.GetTypeInfo(argumentExpression, context.CancellationToken);
                 var argumentAttributes = argumentType.Type.GetAttributes();
 
-                if (!argumentAttributes.Any(attr => attr.AttributeClass.Name == attributeType.Name))
+                if (!argumentAttributes.Any(attr => attr.AttributeClass == attributeType))
                 {
                     var diagnostic = Diagnostic.Create(Rule, argument.GetLocation(), argumentType.Type.Name, attributeType.Name);
                     context.ReportDiagnostic(diagnostic);
@@ -91,7 +91,7 @@ namespace DemoAnalyzer
 
                 var argumentAttributes = argumentType.GetAttributes();
 
-                if (!argumentAttributes.Any(attr => attr.AttributeClass.Name == attributeType.Name))
+                if (!argumentAttributes.Any(attr =>  attr.AttributeClass == attributeType))
                 {
                     var diagnostic = Diagnostic.Create(Rule, argument.Syntax.GetLocation(), argumentType.Name, attributeType.Name);
                     context.ReportDiagnostic(diagnostic);
