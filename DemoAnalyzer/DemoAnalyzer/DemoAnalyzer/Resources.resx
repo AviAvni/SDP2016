@@ -130,13 +130,13 @@
     <comment>The title of the diagnostic.</comment>
   </data>
   <data name="GenericAnalyzerDescription" xml:space="preserve">
-    <value>Generic analyzer for checking attributes</value>
+    <value>Type should be decorated with attribute</value>
   </data>
   <data name="GenericAnalyzerMessageFormat" xml:space="preserve">
-    <value>Type '{0}' not contains attribute '{1}'</value>
+    <value>Type '{0}' is not decorated with '{1}' attribute</value>
   </data>
   <data name="GenericAnalyzerTitle" xml:space="preserve">
-    <value>Generic analyzer for checking attributes</value>
+    <value>Type should be decorated with attribute</value>
   </data>
   <data name="RethrowAnalyzerDescription" xml:space="preserve">
     <value>Re-throwing caught exception changes stack information.</value>

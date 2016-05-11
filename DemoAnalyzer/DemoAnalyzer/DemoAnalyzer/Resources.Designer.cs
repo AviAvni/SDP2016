@@ -89,7 +89,7 @@ namespace DemoAnalyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generic analyzer for checking attributes.
+        ///   Looks up a localized string similar to Type should be decorated with attribute.
         /// </summary>
         internal static string GenericAnalyzerDescription {
             get {
@@ -98,7 +98,7 @@ namespace DemoAnalyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type &apos;{0}&apos; not contains attribute &apos;{1}&apos;.
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; is not decorated with &apos;{1}&apos; attribute.
         /// </summary>
         internal static string GenericAnalyzerMessageFormat {
             get {
@@ -107,7 +107,7 @@ namespace DemoAnalyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generic analyzer for checking attributes.
+        ///   Looks up a localized string similar to Type should be decorated with attribute.
         /// </summary>
         internal static string GenericAnalyzerTitle {
             get {
