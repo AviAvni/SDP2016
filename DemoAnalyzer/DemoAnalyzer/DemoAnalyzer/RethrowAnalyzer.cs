@@ -49,14 +49,16 @@ namespace DemoAnalyzer
                                 return;
                             }
 
-                            // if (local.LocalKind != LocalKind.Catch) return; // TODO: expose LocalKind in the symbol model?
-
                             var catchClause = syntax as CatchClauseSyntax;
-                            if (catchClause != null && catchClause.Declaration.Span.Contains(local.Locations[0].SourceSpan))
+                            if (catchClause != null)
                             {
-                                var diagnostic = Diagnostic.Create(Rule, throwStatement.GetLocation());
-                                context.ReportDiagnostic(diagnostic);
-                                return;
+                                var declaredSymbol = context.SemanticModel.GetDeclaredSymbol(catchClause.Declaration);
+                                if (local == declaredSymbol)
+                                {
+                                    var diagnostic = Diagnostic.Create(Rule, throwStatement.GetLocation());
+                                    context.ReportDiagnostic(diagnostic);
+                                    return;
+                                }
                             }
                         }
 

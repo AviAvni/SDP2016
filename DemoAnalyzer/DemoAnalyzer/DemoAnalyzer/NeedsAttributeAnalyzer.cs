@@ -54,15 +54,40 @@ namespace DemoAnalyzer
 
                 var argument = invocationExpression.ArgumentList.Arguments[i];
                 var argumentExpression = argument.Expression;
-                var argumentType = context.SemanticModel.GetTypeInfo(argumentExpression, context.CancellationToken);
-                var argumentAttributes = argumentType.Type.GetAttributes();
+                var argumentType = (INamedTypeSymbol)context.SemanticModel.GetTypeInfo(argumentExpression, context.CancellationToken).Type;
 
-                if (!argumentAttributes.Any(attr => attr.AttributeClass == attributeType))
+                string typeError;
+                if (!ValidateArgumentType(attributeType, argumentType, out typeError))
                 {
-                    var diagnostic = Diagnostic.Create(Rule, argument.GetLocation(), argumentType.Type.Name, attributeType.Name);
+                    var diagnostic = Diagnostic.Create(Rule, argument.GetLocation(), typeError, attributeType.Name);
                     context.ReportDiagnostic(diagnostic);
                 }
             }
+        }
+
+        private static bool ValidateArgumentType(INamedTypeSymbol attributeType, INamedTypeSymbol argumentType, out string typeError)
+        {
+            typeError = null;
+
+            if (!argumentType.IsGenericType)
+            {
+                if (!argumentType.GetAttributes().Any(attr => attr.AttributeClass == attributeType))
+                {
+                    typeError = argumentType.Name;
+                    return false;
+                }
+            }
+            else
+            {
+                var innerArgumentType = argumentType.TypeArguments[0];
+                if (!innerArgumentType.GetAttributes().Any(attr => attr.AttributeClass == attributeType))
+                {
+                    typeError = innerArgumentType.Name;
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void AnalyzeInvocationOperation(OperationAnalysisContext context)
@@ -81,19 +106,18 @@ namespace DemoAnalyzer
                 var attributeType = (INamedTypeSymbol)attribute.ConstructorArguments[0].Value;
 
                 var argument = invocationExpression.GetArgumentMatchingParameter(parameter);
-                var argumentType = argument.Value.Type;
+                var argumentType = (INamedTypeSymbol)argument.Value.Type;
                 if (argument.Value.Kind == OperationKind.ConversionExpression)
                 {
-                    argumentType = ((IConversionExpression)argument.Value).Operand.Type;
+                    argumentType = (INamedTypeSymbol)((IConversionExpression)argument.Value).Operand.Type;
                 }
                 if (argumentType == null)
                     return;
 
-                var argumentAttributes = argumentType.GetAttributes();
-
-                if (!argumentAttributes.Any(attr =>  attr.AttributeClass == attributeType))
+                string typeError;
+                if (!ValidateArgumentType(attributeType, argumentType, out typeError))
                 {
-                    var diagnostic = Diagnostic.Create(Rule, argument.Syntax.GetLocation(), argumentType.Name, attributeType.Name);
+                    var diagnostic = Diagnostic.Create(Rule, argument.Syntax.GetLocation(), typeError, attributeType.Name);
                     context.ReportDiagnostic(diagnostic);
                 }
             }
