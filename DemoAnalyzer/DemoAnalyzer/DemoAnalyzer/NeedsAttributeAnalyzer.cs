@@ -35,9 +35,8 @@ namespace DemoAnalyzer
             var invocationExpression = (InvocationExpressionSyntax)context.Node;
             if (invocationExpression.ArgumentList.Arguments.Count == 0 ||
                 context.SemanticModel.GetDiagnostics(invocationExpression.Span).Any(d => d.Severity == DiagnosticSeverity.Error))
-            {
                 return;
-            }
+
             var symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpression, context.CancellationToken);
             var targetMethod = symbolInfo.Symbol as IMethodSymbol;
             if (targetMethod == null)

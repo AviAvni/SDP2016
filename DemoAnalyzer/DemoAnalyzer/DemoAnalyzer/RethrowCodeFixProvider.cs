@@ -50,11 +50,11 @@ namespace DemoAnalyzer
 
         private async Task<Solution> MakeRethrowAsync(Document document, ThrowStatementSyntax throwStatement, CancellationToken cancellationToken)
         {
-            var rethrowExpression = SyntaxFactory.ThrowStatement();
+            var rethrowStatement = SyntaxFactory.ThrowStatement();
 
             var root = await document.GetSyntaxRootAsync();
 
-            var newRoot = root.ReplaceNode(throwStatement, rethrowExpression);
+            var newRoot = root.ReplaceNode(throwStatement, rethrowStatement);
 
             var newDocument = document.WithSyntaxRoot(newRoot);
 
