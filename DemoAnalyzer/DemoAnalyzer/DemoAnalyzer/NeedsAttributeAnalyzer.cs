@@ -45,15 +45,18 @@ namespace DemoAnalyzer
             for (int i = 0; i < targetMethod.Parameters.Length; i++)
             {
                 var parameter = targetMethod.Parameters[i];
-                var attribute = parameter.GetAttributes().FirstOrDefault(attr => attr.AttributeClass.Name == "NeedsAttribute");
-                if (attribute == null || attribute.ConstructorArguments.Length != 1 || attribute.ConstructorArguments[0].Kind != TypedConstantKind.Type)
+                var attribute = parameter.GetAttributes()
+                    .FirstOrDefault(attr => attr.AttributeClass.Name == "NeedsAttribute");
+                if (attribute == null || attribute.ConstructorArguments.Length != 1 || 
+                    attribute.ConstructorArguments[0].Kind != TypedConstantKind.Type)
                     continue;
 
                 var attributeType = (INamedTypeSymbol)attribute.ConstructorArguments[0].Value;
 
                 var argument = invocationExpression.ArgumentList.Arguments[i];
                 var argumentExpression = argument.Expression;
-                var argumentType = (INamedTypeSymbol)context.SemanticModel.GetTypeInfo(argumentExpression, context.CancellationToken).Type;
+                var argumentType = (INamedTypeSymbol)context.SemanticModel
+                    .GetTypeInfo(argumentExpression, context.CancellationToken).Type;
 
                 string typeError;
                 if (!ValidateArgumentType(attributeType, argumentType, out typeError))
@@ -98,8 +101,10 @@ namespace DemoAnalyzer
 
             foreach (var parameter in targetMethod.Parameters)
             {
-                var attribute = parameter.GetAttributes().FirstOrDefault(attr => attr.AttributeClass.Name == "NeedsAttribute");
-                if (attribute == null || attribute.ConstructorArguments.Length != 1 || attribute.ConstructorArguments[0].Kind != TypedConstantKind.Type)
+                var attribute = parameter.GetAttributes()
+                    .FirstOrDefault(attr => attr.AttributeClass.Name == "NeedsAttribute");
+                if (attribute == null || attribute.ConstructorArguments.Length != 1 || 
+                    attribute.ConstructorArguments[0].Kind != TypedConstantKind.Type)
                     continue;
 
                 var attributeType = (INamedTypeSymbol)attribute.ConstructorArguments[0].Value;
@@ -108,7 +113,8 @@ namespace DemoAnalyzer
                 var argumentType = (INamedTypeSymbol)argument.Value.Type;
                 if (argument.Value.Kind == OperationKind.ConversionExpression)
                 {
-                    argumentType = (INamedTypeSymbol)((IConversionExpression)argument.Value).Operand.Type;
+                    argumentType = (INamedTypeSymbol)((IConversionExpression)argument.Value)
+                        .Operand.Type;
                 }
                 if (argumentType == null)
                     return;
