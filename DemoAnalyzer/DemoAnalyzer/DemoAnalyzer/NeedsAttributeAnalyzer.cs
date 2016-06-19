@@ -18,7 +18,7 @@ namespace DemoAnalyzer
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.GenericAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.GenericAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.GenericAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
-        private const string Category = "Generic";
+        private const string Category = "Usage";
 
         internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, true);
 

@@ -15,7 +15,6 @@ namespace DemoAnalyzer
     public class MakeUppercaseAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "DemoAnalyzer";
-        public const string GenericDiagnosticId = "GenericDemoAnalyzer";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
